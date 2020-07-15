@@ -86,6 +86,8 @@ import Foreign.Marshal.Array
 
 import Network.Socket.Imports
 
+import System.IO
+
 -----------------------------------------------------------------------------
 
 -- | Basic type for a socket.
@@ -197,9 +199,10 @@ foreign import ccall unsafe "dup"
 -- | Creating a socket from a file descriptor.
 mkSocket :: CInt -> IO Socket
 mkSocket fd = do
+    hPutStrLn stderr ("mkSocket " <> show fd)
     ref <- newIORef fd
     let s = Socket ref fd
-    void $ mkWeakIORef ref $ close s
+    void $ mkWeakIORef ref (hPutStrLn stderr ("GC socket " <> show fd) *> close s)
     return s
 
 invalidSocket :: CInt
